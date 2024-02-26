@@ -73,10 +73,12 @@ export default {
       if (!this.modal.color) return
       this.colorHover = this.modal.color
       this.modal.color = COLOR_HOVER
+      this.modal.updateRenderGraph?.()
     },
     mouseleave() {
       if (!this.modal.color || this.modal.color === COLOR_CLICK) return
       this.modal.color = this.colorHover
+      this.modal.updateRenderGraph?.()
     },
     hex3ToHex6(hex3) {
       return '#' + hex3[1] + hex3[1] + hex3[2] + hex3[2] + hex3[3] + hex3[3];
