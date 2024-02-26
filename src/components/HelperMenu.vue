@@ -1,7 +1,7 @@
 <template>
   <div class="zdog-helper-li">
     <div :id="id" class="tab" :class="{ active: id === selectedId }" @click="handleClick(id, modal)"
-      @mouseenter="mouseenter" @mouseleave="mouseleave">
+      @mouseenter="mouseenter" @mouseleave="mouseleave" v-show="!menuClose">
       <div v-if="modal.children && modal.children.length" class="triangle" :class="{ collapse: collapse }"
         @click="collapse = !collapse"></div>
       <span v-if="level == 0">Illustration</span>
@@ -21,7 +21,8 @@
       </span>
     </div>
     <helper-menu v-show="!collapse" :modal="modal" :level="level + 1" :selectedId="selectedId" @update="update"
-      v-for="modal in modal.children" :key="modal"></helper-menu>
+      v-for="modal in modal.children" :key="modal" :menuClose="menuClose"></helper-menu>
+    <div v-if="level === 0" class="bar" @click="menuBarClick()"></div>
   </div>
 </template>
 
@@ -39,10 +40,13 @@ export default {
       colorHover: null
     }
   },
-  props: ['modal', 'level', 'selectedId'],
+  props: ['modal', 'level', 'selectedId', 'menuClose'],
   computed: {
     id() {
       return uuidv4()
+    },
+    menuPadding() {
+      return this.menuClose ? '0' : '10px 0 10px 20px'
     }
   },
   watch: {
@@ -84,6 +88,9 @@ export default {
       const g = parseInt(hex.substring(2, 4), 16);
       const b = parseInt(hex.substring(4, 6), 16);
       return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    },
+    menuBarClick() {
+      this.$emit('menuBarUpdate')
     }
   }
 }
@@ -91,7 +98,7 @@ export default {
 
 <style scoped>
 .zdog-helper-li {
-  padding-left: 20px;
+  padding: v-bind(menuPadding);
   color: #333;
 }
 
@@ -130,5 +137,15 @@ export default {
 
 .triangle.collapse::before {
   transform: rotate(0deg);
+}
+
+.bar {
+  position: fixed;
+  width: 10px;
+  height: 100%;
+  background-color: #f40;
+  top: 0;
+  left: 0;
+  cursor: pointer;
 }
 </style>

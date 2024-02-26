@@ -1,5 +1,6 @@
 <template>
-  <helper-menu ref="helperMenu" class="helper-menu" :modal="modal" :level="0" :selectedId="selectedId" @update="update"></helper-menu>
+  <helper-menu ref="helperMenu" class="helper-menu" :modal="modal" :level="0" :selectedId="selectedId" @update="update"
+    :menuClose="menuClose" @menuBarUpdate="menuBarUpdate"></helper-menu>
   <helper-set ref="helperSet" v-if="selected" class="helper-set" :root="modal" :modal="selected"></helper-set>
 </template>
 
@@ -11,7 +12,8 @@ export default {
   data() {
     return {
       selected: null,
-      selectedId: ''
+      selectedId: '',
+      menuClose: false
     }
   },
   props: ['modal'],
@@ -25,6 +27,9 @@ export default {
       this.selectedId = id
       this.selected = modal
       this.$refs.helperSet.reset()
+    },
+    menuBarUpdate() {
+      this.menuClose = !this.menuClose
     }
   }
 }
