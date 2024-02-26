@@ -1,5 +1,5 @@
 <template>
-  <div class="zdog-helper-li">
+  <div class="zdog-helper-li" :class="{ 'menu-root': level === 0 }">
     <div :id="id" class="tab" :class="{ active: id === selectedId }" @click="handleClick(id, modal)"
       @mouseenter="mouseenter" @mouseleave="mouseleave" v-show="!menuClose">
       <div v-if="modal.children && modal.children.length" class="triangle" :class="{ collapse: collapse }"
@@ -47,6 +47,9 @@ export default {
     },
     menuPadding() {
       return this.menuClose ? '0' : '10px 0 10px 20px'
+    },
+    liPadding() {
+      return this.menuClose ? '0' : '20px'
     }
   },
   watch: {
@@ -73,12 +76,10 @@ export default {
       if (!this.modal.color) return
       this.colorHover = this.modal.color
       this.modal.color = COLOR_HOVER
-      this.modal.updateRenderGraph?.()
     },
     mouseleave() {
       if (!this.modal.color || this.modal.color === COLOR_CLICK) return
       this.modal.color = this.colorHover
-      this.modal.updateRenderGraph?.()
     },
     hex3ToHex6(hex3) {
       return '#' + hex3[1] + hex3[1] + hex3[2] + hex3[2] + hex3[3] + hex3[3];
@@ -100,8 +101,12 @@ export default {
 
 <style scoped>
 .zdog-helper-li {
-  padding: v-bind(menuPadding);
   color: #333;
+  padding-left: v-bind(liPadding);
+}
+
+.menu-root {
+  padding: v-bind(menuPadding);
 }
 
 .tab {
