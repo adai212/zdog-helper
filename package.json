@@ -1,8 +1,21 @@
 {
   "name": "zdog-helper",
-  "private": true,
+  "private": false,
   "version": "1.0.0",
+  "author": "Hamburger",
+  "description": "a zdog helper plugin for vue",
   "type": "module",
+  "main": "dist/zdog-helper.umd.cjs",
+  "files": [
+    "dist/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adai212/zdog-helper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/adai212/zdog-helper/issues"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
