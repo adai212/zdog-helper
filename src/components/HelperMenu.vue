@@ -66,7 +66,7 @@ export default {
   methods: {
     handleClick() {
       if (this.id === this.selectedId) return
-      console.log(this.modal)
+      console.debug(this.modal)
       this.$emit('update', this.id, this.modal)
     },
     update(id, modal) {

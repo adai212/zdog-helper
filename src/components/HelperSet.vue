@@ -4,6 +4,8 @@
       <div v-if="modal.visible != null">
         <span class="title">visible:</span>
         <input class="hide-arrow" type="checkbox" v-model="modal.visible" @input="update">
+        <span class="title">invert:</span>
+        <input class="hide-arrow" type="checkbox" v-model="invert" @input="invertVisible">
       </div>
       <div v-if="modal.stroke != null">
         <span class="title">stroke:</span>
@@ -40,7 +42,7 @@
         <input class="hide-arrow" type="number" v-model="all" @input="updateAll" step="0.1">
       </div>
       <div v-if="!isShape && modal.path">
-        <div v-for="path in modal.path" :key="path">
+        <div v-for="(path, index) in pathCache" :key="path">
           <span class="title" v-if="path.line || path.x != null || path.y != null || path.z != null">line:</span>
           <span class="title" v-if="path.move">move:</span>
           <span v-if="path.x != null || path.y != null || path.z != null">
@@ -50,6 +52,8 @@
             <input class="hide-arrow" type="number" v-model="path.y" @input="update" step="0.1">
             <label>z</label>
             <input class="hide-arrow" type="number" v-model="path.z" @input="update" step="0.1">
+            <input class="hide-arrow" type="checkbox" v-model="paths[index]" @input="invertPath($event, index)"
+              :disabled="modal.path.length <= 1 && paths[index]">
           </span>
           <span v-if="path.line">
             <label>x</label>
@@ -69,6 +73,8 @@
           </span>
           <div v-if="path.arc">
             <span class="title">arc:</span>
+            <input class="hide-arrow" type="checkbox" v-model="paths[index]" @input="invertPath($event, index)"
+              :disabled="modal.path.length <= 1 && paths[index]">
             <div v-for="(arc, i) in path.arc" :key="arc">
               <span class="title">{{ ['corner', 'end'][i] }}</span>
               <label>x</label>
@@ -81,6 +87,8 @@
           </div>
           <div v-if="path.bezier">
             <span class="title">bezier:</span>
+            <input class="hide-arrow" type="checkbox" v-model="paths[index]" @input="invertPath($event, index)"
+              :disabled="modal.path.length <= 1 && paths[index]">
             <div v-for="(bezier, i) in path.bezier" :key="bezier">
               <span class="title">{{ ['start', 'end', 'dest'][i] }}</span>
               <label>x</label>
@@ -137,6 +145,10 @@
         <span class="title">closed:</span>
         <input class="hide-arrow" type="checkbox" v-model="modal.closed" @input="update">
       </div>
+      <div v-if="modal.zoom">
+        <span class="title">zoom:</span>
+        <input class="hide-arrow" type="number" v-model="modal.zoom" @input="update" step="0.1">
+      </div>
     </div>
     <div class="bar" @click="setBarClick()"></div>
   </div>
@@ -147,7 +159,11 @@ export default {
   data() {
     return {
       all: 1,
-      setClose: false
+      setClose: false,
+      invert: false,
+      visibles: [],
+      pathCache: [],
+      paths: []
     }
   },
   props: ['root', 'modal'],
@@ -179,9 +195,50 @@ export default {
     },
     reset() {
       this.all = 1
+      if (this.invert) {
+        this.renderFlatGraph(this.root._flatGraph, false)
+        this.invert = false
+      }
+      this.$nextTick(() => {
+        this.pathCache = this.modal.path
+        this.paths = this.getPaths()
+      })
+    },
+    getPaths() {
+      if (this.isShape || !this.modal.path) return []
+      return Array(this.pathCache.length).fill(true)
     },
     setBarClick() {
       this.setClose = !this.setClose
+    },
+    invertVisible(event) {
+      if (event.target.checked) {
+        this.visibles = []
+      }
+      this.renderFlatGraph(this.root._flatGraph, event.target.checked)
+    },
+    renderFlatGraph(_flatGraph, checked) {
+      _flatGraph.forEach(item => {
+        if (item.visible == null) return
+        if (item.path == null && !item.leftFace) {
+          this.renderFlatGraph(item._flatGraph, checked)
+          return
+        }
+        if (checked) {
+          this.visibles.push(item.visible)
+          item.visible = false
+          this.modal.flatGraph.forEach(item => { item.visible = true })
+        } else {
+          item.visible = this.visibles.pop()
+        }
+      })
+    },
+    invertPath(event, index) {
+      this.modal.path = this.pathCache.filter((item, i) => {
+        if (i === index) return event.target.checked
+        return this.paths[i]
+      })
+      this.modal.updatePath?.()
     }
   }
 }
