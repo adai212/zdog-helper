@@ -1,11 +1,11 @@
 {
   "name": "zdog-helper",
   "private": false,
-  "version": "1.0.6",
+  "version": "1.0.7",
   "author": "Hamburger",
   "description": "a zdog helper plugin for vue",
   "type": "module",
-  "main": "dist/zdog-helper.umd.cjs",
+  "main": "dist/zdog-helper.umd.js",
   "files": [
     "dist/*"
   ],
