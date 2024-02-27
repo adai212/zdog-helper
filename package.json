@@ -1,7 +1,7 @@
 {
   "name": "zdog-helper",
   "private": false,
-  "version": "1.0.5",
+  "version": "1.0.6",
   "author": "Hamburger",
   "description": "a zdog helper plugin for vue",
   "type": "module",
